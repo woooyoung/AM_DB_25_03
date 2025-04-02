@@ -6,7 +6,7 @@ import org.example.util.SecSql;
 import java.sql.Connection;
 
 public class MemberDao {
-    
+
 
     public boolean isLoginIdDup(Connection conn, String loginId) {
         SecSql sql = new SecSql();
