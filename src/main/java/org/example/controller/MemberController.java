@@ -1,22 +1,19 @@
 package org.example.controller;
 
+import org.example.container.Container;
 import org.example.dto.Member;
 import org.example.service.MemberService;
 
-import java.sql.Connection;
 import java.util.Scanner;
 
 public class MemberController {
 
-    private Connection conn;
-    private Scanner sc;
-
     private MemberService memberService;
+    Scanner sc;
 
-    public MemberController(Scanner sc, Connection conn) {
-        this.sc = sc;
-        this.conn = conn;
-        this.memberService = new MemberService();
+    public MemberController() {
+        this.memberService = Container.memberService;
+        sc = Container.sc;
     }
 
     public void doJoin() {
@@ -34,7 +31,7 @@ public class MemberController {
                 continue;
             }
 
-            boolean isLoginIdDup = memberService.isLoginIdDup(conn, loginId);
+            boolean isLoginIdDup = memberService.isLoginIdDup(loginId);
 
             System.out.println(isLoginIdDup);
 
@@ -86,12 +83,14 @@ public class MemberController {
             break;
         }
 
-        int id = memberService.doJoin(conn, loginId, loginPw, name);
+        int id = memberService.doJoin(loginId, loginPw, name);
 
         System.out.println(id + "번 회원이 가입됨");
     }
 
     public void login() {
+
+
         String loginId = null;
         String loginPw = null;
 
@@ -105,7 +104,7 @@ public class MemberController {
                 continue;
             }
 
-            boolean isLoginIdDup = memberService.isLoginIdDup(conn, loginId);
+            boolean isLoginIdDup = memberService.isLoginIdDup(loginId);
 
             if (isLoginIdDup == false) {
                 System.out.println(loginId + "은(는) 없어");
@@ -115,7 +114,7 @@ public class MemberController {
 
         }
 
-        Member member = memberService.getMemberByLoginId(conn, loginId);
+        Member member = memberService.getMemberByLoginId(loginId);
 
         int tryMaxCount = 3;
         int tryCount = 0;
@@ -140,8 +139,29 @@ public class MemberController {
                 continue;
             }
 
+
+            Container.session.loginedMember = member;
+            Container.session.loginedMemberId = member.getId();
+
             System.out.println(member.getName() + "님 환영합니다");
             break;
         }
+    }
+
+    public void showProfile() {
+        if (Container.session.loginedMemberId == -1) {
+            System.out.println("로그인 상태 x");
+            return;
+        } else {
+            System.out.println(Container.session.loginedMember);
+        }
+
+    }
+
+    public void logout() {
+        System.out.println("==로그아웃==");
+        Container.session.loginedMember = null;
+        Container.session.loginedMemberId = -1;
+
     }
 }
