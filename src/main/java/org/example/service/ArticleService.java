@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.Article;
+import org.example.dto.Article;
 import org.example.dao.ArticleDao;
 
 import java.sql.Connection;
@@ -21,6 +21,7 @@ public class ArticleService {
     }
 
     public List<Article> getArticles() {
+        
         return articleDao.getArticles();
     }
 

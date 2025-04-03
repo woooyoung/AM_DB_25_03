@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.Member;
 import org.example.service.MemberService;
 
 import java.sql.Connection;
@@ -88,5 +89,59 @@ public class MemberController {
         int id = memberService.doJoin(conn, loginId, loginPw, name);
 
         System.out.println(id + "번 회원이 가입됨");
+    }
+
+    public void login() {
+        String loginId = null;
+        String loginPw = null;
+
+        System.out.println("==로그인==");
+        while (true) {
+            System.out.print("로그인 아이디 : ");
+            loginId = sc.nextLine().trim();
+
+            if (loginId.length() == 0 || loginId.contains(" ")) {
+                System.out.println("아이디 똑바로 써");
+                continue;
+            }
+
+            boolean isLoginIdDup = memberService.isLoginIdDup(conn, loginId);
+
+            if (isLoginIdDup == false) {
+                System.out.println(loginId + "은(는) 없어");
+                continue;
+            }
+            break;
+
+        }
+
+        Member member = memberService.getMemberByLoginId(conn, loginId);
+
+        int tryMaxCount = 3;
+        int tryCount = 0;
+
+        while (true) {
+            if (tryCount >= tryMaxCount) {
+                System.out.println("비번 다시 확인하고 시도해");
+                break;
+            }
+            System.out.print("비밀번호 : ");
+            loginPw = sc.nextLine().trim();
+
+            if (loginPw.length() == 0 || loginPw.contains(" ")) {
+                tryCount++;
+                System.out.printf("비번 똑바로 써(%d/3)\n", tryCount);
+                continue;
+            }
+
+            if (member.getLoginPw().equals(loginPw) == false) {
+                tryCount++;
+                System.out.printf("일치하지 않아(%d/3)\n", tryCount);
+                continue;
+            }
+
+            System.out.println(member.getName() + "님 환영합니다");
+            break;
+        }
     }
 }
